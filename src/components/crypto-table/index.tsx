@@ -18,6 +18,7 @@ export default function CryptoTable() {
     dataUpdatedAt,
     refetchCryptoData,
   } = useCryptoData()
+
   const cryptoData = Object.values(cryptos)
 
   return (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useReducer, useMemo } from 'react'
 import { ArrowRightLeft } from 'lucide-react'
 import {
   Card,
@@ -18,6 +18,8 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { useQueryClient } from '@tanstack/react-query'
+import { CRYPTO_DATA } from '@/services/query-keys'
 
 interface Crypto {
   id: string
@@ -26,80 +28,101 @@ interface Crypto {
   priceUsd: string
 }
 
-export default function CurrencyConverter() {
-  const [cryptos, setCryptos] = useState<Crypto[]>([])
-  const [loading, setLoading] = useState(true)
-  const [fromCurrency, setFromCurrency] = useState('')
-  const [toCurrency, setToCurrency] = useState('')
-  const [amount, setAmount] = useState<string>('1')
-  const [convertedAmount, setConvertedAmount] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+interface State {
+  fromCurrency: string
+  toCurrency: string
+  amount: string
+  convertedAmount: string | null
+  error: string | null
+}
 
-  useEffect(() => {
-    const fetchCryptos = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch(
-          'https://api.coincap.io/v2/assets?limit=10',
-        )
+type Action =
+  | { type: 'SET_FROM_CURRENCY'; payload: string }
+  | { type: 'SET_TO_CURRENCY'; payload: string }
+  | { type: 'SET_AMOUNT'; payload: string }
+  | { type: 'SET_CONVERTED_AMOUNT'; payload: string | null }
+  | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'SWAP_CURRENCIES' }
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch cryptocurrency data')
-        }
+const initialState: State = {
+  fromCurrency: '',
+  toCurrency: '',
+  amount: '1',
+  convertedAmount: null,
+  error: null,
+}
 
-        const data = await response.json()
-        setCryptos(data.data)
-
-        // Set default values
-        if (data.data.length >= 2) {
-          setFromCurrency(data.data[0].id)
-          setToCurrency(data.data[1].id)
-        }
-      } catch (err) {
-        setError('Error fetching cryptocurrency data. Please try again later.')
-        console.error(err)
-      } finally {
-        setLoading(false)
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case 'SET_FROM_CURRENCY':
+      return { ...state, fromCurrency: action.payload, convertedAmount: null }
+    case 'SET_TO_CURRENCY':
+      return { ...state, toCurrency: action.payload, convertedAmount: null }
+    case 'SET_AMOUNT':
+      return { ...state, amount: action.payload, convertedAmount: null }
+    case 'SET_CONVERTED_AMOUNT':
+      return { ...state, convertedAmount: action.payload, error: null }
+    case 'SET_ERROR':
+      return { ...state, error: action.payload }
+    case 'SWAP_CURRENCIES':
+      return {
+        ...state,
+        fromCurrency: state.toCurrency,
+        toCurrency: state.fromCurrency,
+        convertedAmount: null,
       }
-    }
+    default:
+      return state
+  }
+}
 
-    fetchCryptos()
-  }, [])
+export default function CurrencyConverter() {
+  const queryClient = useQueryClient()
+  const cryptoData: Record<string, Crypto> = queryClient.getQueryData([
+    CRYPTO_DATA,
+  ])!
+
+  const cryptos: Crypto[] = useMemo(
+    () => Object.values(cryptoData || {}),
+    [cryptoData],
+  )
+
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   const handleConvert = () => {
-    if (!fromCurrency || !toCurrency || !amount) {
-      setError('Please select currencies and enter an amount')
+    if (!state.fromCurrency || !state.toCurrency || !state.amount) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: 'Please select currencies and enter an amount',
+      })
       return
     }
 
     try {
-      const fromCryptoPrice = cryptos.find(
-        (c) => c.id === fromCurrency,
-      )?.priceUsd
-      const toCryptoPrice = cryptos.find((c) => c.id === toCurrency)?.priceUsd
+      const fromCrypto = cryptoData[state.fromCurrency]
+      const toCrypto = cryptoData[state.toCurrency]
 
-      if (!fromCryptoPrice || !toCryptoPrice) {
-        setError('Could not find price data for selected currencies')
+      if (!fromCrypto || !toCrypto) {
+        dispatch({
+          type: 'SET_ERROR',
+          payload: 'Could not find price data for selected currencies',
+        })
         return
       }
 
       const fromValueInUsd =
-        Number.parseFloat(amount) * Number.parseFloat(fromCryptoPrice)
-      const convertedValue = fromValueInUsd / Number.parseFloat(toCryptoPrice)
+        Number.parseFloat(state.amount) * Number.parseFloat(fromCrypto.priceUsd)
+      const convertedValue =
+        fromValueInUsd / Number.parseFloat(toCrypto.priceUsd)
 
-      setConvertedAmount(convertedValue.toFixed(8))
-      setError(null)
+      dispatch({
+        type: 'SET_CONVERTED_AMOUNT',
+        payload: convertedValue.toFixed(8),
+      })
     } catch (err) {
-      setError('Error performing conversion')
+      dispatch({ type: 'SET_ERROR', payload: 'Error performing conversion' })
       console.error(err)
     }
-  }
-
-  const handleSwap = () => {
-    const temp = fromCurrency
-    setFromCurrency(toCurrency)
-    setToCurrency(temp)
-    setConvertedAmount(null)
   }
 
   return (
@@ -109,106 +132,79 @@ export default function CurrencyConverter() {
         <CardDescription>Convert between cryptocurrencies</CardDescription>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="py-4 text-center">Loading currencies...</div>
-        ) : (
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <label htmlFor="amount" className="text-sm font-medium">
-                Amount
-              </label>
-              <Input
-                id="amount"
-                type="number"
-                value={amount}
-                onChange={(e) => {
-                  setAmount(e.target.value)
-                  setConvertedAmount(null)
-                }}
-                placeholder="Enter amount"
-                min="0"
-                step="any"
-              />
-            </div>
+        <div className="grid gap-4">
+          <Input
+            type="number"
+            value={state.amount}
+            onChange={(e) =>
+              dispatch({ type: 'SET_AMOUNT', payload: e.target.value })
+            }
+            placeholder="Enter amount"
+            min="0"
+            step="any"
+          />
 
-            <div className="grid gap-2">
-              <label htmlFor="from-currency" className="text-sm font-medium">
-                From
-              </label>
-              <Select
-                value={fromCurrency}
-                onValueChange={(value) => {
-                  setFromCurrency(value)
-                  setConvertedAmount(null)
-                }}
-              >
-                <SelectTrigger id="from-currency">
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  {cryptos.map((crypto) => (
-                    <SelectItem key={`from-${crypto.id}`} value={crypto.id}>
-                      {crypto.name} ({crypto.symbol})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <Select
+            value={state.fromCurrency}
+            onValueChange={(value) =>
+              dispatch({ type: 'SET_FROM_CURRENCY', payload: value })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
+            <SelectContent>
+              {cryptos.map((crypto) => (
+                <SelectItem key={crypto.id} value={crypto.id}>
+                  {crypto.name} ({crypto.symbol})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-            <div className="my-2 flex justify-center">
-              <Button variant="outline" size="icon" onClick={handleSwap}>
-                <ArrowRightLeft className="h-4 w-4" />
-                <span className="sr-only">Swap currencies</span>
-              </Button>
-            </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => dispatch({ type: 'SWAP_CURRENCIES' })}
+          >
+            <ArrowRightLeft className="h-4 w-4" />
+          </Button>
 
-            <div className="grid gap-2">
-              <label htmlFor="to-currency" className="text-sm font-medium">
-                To
-              </label>
-              <Select
-                value={toCurrency}
-                onValueChange={(value) => {
-                  setToCurrency(value)
-                  setConvertedAmount(null)
-                }}
-              >
-                <SelectTrigger id="to-currency">
-                  <SelectValue placeholder="Select currency" />
-                </SelectTrigger>
-                <SelectContent>
-                  {cryptos.map((crypto) => (
-                    <SelectItem key={`to-${crypto.id}`} value={crypto.id}>
-                      {crypto.name} ({crypto.symbol})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <Select
+            value={state.toCurrency}
+            onValueChange={(value) =>
+              dispatch({ type: 'SET_TO_CURRENCY', payload: value })
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
+            <SelectContent>
+              {cryptos.map((crypto) => (
+                <SelectItem key={crypto.id} value={crypto.id}>
+                  {crypto.name} ({crypto.symbol})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-            <Button onClick={handleConvert} className="mt-2">
-              Convert
-            </Button>
+          <Button onClick={handleConvert}>Convert</Button>
 
-            {error && (
-              <div className="text-destructive mt-2 text-sm">{error}</div>
-            )}
-
-            {convertedAmount && (
-              <div className="bg-muted mt-4 rounded-md p-4">
-                <div className="text-muted-foreground text-sm">Result:</div>
-                <div className="mt-1 text-xl font-bold">
-                  {amount} {cryptos.find((c) => c.id === fromCurrency)?.symbol}{' '}
-                  =
-                </div>
-                <div className="text-primary text-2xl font-bold">
-                  {convertedAmount}{' '}
-                  {cryptos.find((c) => c.id === toCurrency)?.symbol}
-                </div>
+          {state.error && (
+            <div className="text-destructive mt-2 text-sm">{state.error}</div>
+          )}
+          {state.convertedAmount && (
+            <div className="bg-muted mt-4 rounded-md p-4">
+              <div className="text-muted-foreground text-sm">Result:</div>
+              <div className="mt-1 text-xl font-bold">
+                {state.amount} {cryptoData[state.fromCurrency]?.symbol} =
               </div>
-            )}
-          </div>
-        )}
+              <div className="text-primary text-2xl font-bold">
+                {state.convertedAmount} {cryptoData[state.toCurrency]?.symbol}
+              </div>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   )

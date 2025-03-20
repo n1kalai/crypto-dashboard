@@ -5,16 +5,17 @@ import { cryptoDataOptions } from '@/services/get-crypto-data'
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { CRYPTO_DATA } from '@/services/query-keys'
 
-cryptoDataOptions.enabled = false
+cryptoDataOptions.enabled = false // not to fetch data more than 1, we shall update using socket
 
 export const useCryptoData = () => {
   const { data, isLoading, error, dataUpdatedAt, refetch } =
     useSuspenseQuery(cryptoDataOptions)
+
   const queryClient = useQueryClient()
 
   const cryptoDataKeys = Object.keys(data || {})
 
-  const nonHighlightedData = useRef(data || {})
+  const dataWithoutClassName = useRef(data || {}) // to highlight changed table cells, reserve of original data
 
   useEffect(() => {
     const pricesWs = new WebSocket(
@@ -28,12 +29,12 @@ export const useCryptoData = () => {
 
         if (updatedPrices.error) {
           pricesWs.close()
-          interval = setInterval(() => refetch(), 1000 * 60)
+          interval = setInterval(() => refetch(), 1000 * 60) // if sockets are overloaded or not working as expected
           alert(
             `Enabling Polling because of WebSockets overload: ${updatedPrices.error}`,
           )
         } else {
-          const newData = { ...nonHighlightedData.current }
+          const newData = { ...dataWithoutClassName.current }
 
           Object.keys(updatedPrices).forEach((id) => {
             const oldPrice = Number(newData[id].priceUsd)
@@ -42,7 +43,7 @@ export const useCryptoData = () => {
             if (newData[id]) {
               newData[id].priceUsd = updatedPrices[id]
 
-              nonHighlightedData.current = newData
+              dataWithoutClassName.current = newData
 
               if (newPrice > oldPrice) {
                 newData[id].className = 'highlight-green'
@@ -65,6 +66,7 @@ export const useCryptoData = () => {
       if (interval) {
         clearInterval(interval)
       }
+
       if (pricesWs.OPEN) {
         pricesWs.close()
       }

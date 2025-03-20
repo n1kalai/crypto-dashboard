@@ -1,8 +1,10 @@
 import CryptoTable from '@/components/crypto-table'
+import CurrencyConverter from '@/components/currency-converter'
 
 import { getQueryClient } from '@/providers/react-query/get-query-client'
 import { cryptoDataOptions } from '@/services/get-crypto-data'
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query'
+import { Suspense } from 'react'
 
 export default function Home() {
   const queryClient = getQueryClient()
@@ -15,6 +17,9 @@ export default function Home() {
         <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <CryptoTable />
+          </div>
+          <div>
+            <CurrencyConverter />
           </div>
         </div>
       </HydrationBoundary>
