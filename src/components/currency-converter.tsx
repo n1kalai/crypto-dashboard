@@ -86,7 +86,7 @@ export default function CurrencyConverter() {
     () => Object.values(cryptoData || {}),
     [cryptoData],
   )
-
+  
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const handleConvert = () => {
