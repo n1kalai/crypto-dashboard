@@ -97,6 +97,14 @@ export default function CurrencyConverter() {
       })
       return
     }
+   
+    if (+state.amount < 0) {
+      dispatch({
+        type: 'SET_ERROR',
+        payload: 'Please provide correct number',
+      })
+      return
+    }
 
     try {
       const fromCrypto = cryptoData[state.fromCurrency]
