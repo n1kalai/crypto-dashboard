@@ -1,7 +1,6 @@
-import type { Crypto } from "@/types/crypto-type"
+import type { Crypto } from '@/types/crypto-type'
 import { queryOptions } from '@tanstack/react-query'
-import { CRYPTO_DATA } from "./query-keys"
-
+import { CRYPTO_DATA } from './query-keys'
 
 const fetchCryptoData = async (): Promise<Record<string, Crypto>> => {
   try {
@@ -22,19 +21,16 @@ const fetchCryptoData = async (): Promise<Record<string, Crypto>> => {
         priceUsd: crypto.priceUsd,
         changePercent24Hr: crypto.changePercent24Hr,
         marketCapUsd: crypto.marketCapUsd,
-        volumeUsd24Hr: crypto.volumeUsd24Hr
-      };
-      return acc;
-    }, {});
-
+        volumeUsd24Hr: crypto.volumeUsd24Hr,
+      }
+      return acc
+    }, {})
   } catch (err) {
     throw new Error('Failed to fetch cryptocurrency data')
   }
 }
 
-
 export const cryptoDataOptions = queryOptions({
   queryKey: [CRYPTO_DATA],
   queryFn: fetchCryptoData,
 })
-

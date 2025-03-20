@@ -121,13 +121,12 @@
   }
 
   .highlight-red {
-      animation: highlightRed 1s ease-in-out;
+    animation: highlightRed 1s ease-in-out;
   }
 
   .highlight-green {
-      animation: highlightGreen 1s ease-in-out;
+    animation: highlightGreen 1s ease-in-out;
   }
-
 
   @keyframes highlightRed {
     0% {
@@ -138,7 +137,6 @@
     }
   }
 
-  
   @keyframes highlightGreen {
     0% {
       background-color: green;

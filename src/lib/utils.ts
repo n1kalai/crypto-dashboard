@@ -5,7 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-
 export const formatPrice = (price: string) => {
   const numPrice = Number.parseFloat(price)
   if (numPrice > 1000) {
@@ -41,8 +40,8 @@ export const formatPercent = (percent: string) => {
 }
 
 export function getTimeFromMilliseconds(ms: number) {
-  const date = new Date(ms);
-  const hours = date.getHours().toString().padStart(2, '0'); // Ensure two-digit format
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  return `${hours}:${minutes}`;
+  const date = new Date(ms)
+  const hours = date.getHours().toString().padStart(2, '0') // Ensure two-digit format
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  return `${hours}:${minutes}`
 }
