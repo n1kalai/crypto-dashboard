@@ -119,4 +119,32 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .highlight-red {
+      animation: highlightRed 1s ease-in-out;
+  }
+
+  .highlight-green {
+      animation: highlightGreen 1s ease-in-out;
+  }
+
+
+  @keyframes highlightRed {
+    0% {
+      background-color: red;
+    }
+    100% {
+      background-color: white;
+    }
+  }
+
+  
+  @keyframes highlightGreen {
+    0% {
+      background-color: green;
+    }
+    100% {
+      background-color: white;
+    }
+  }
 }
