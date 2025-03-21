@@ -46,7 +46,7 @@ export const CryptoTableRow = ({
           {formatTablePrice(price, showEUR, EUR_PRICE)}
 
           {typeof priceIncreased !== 'undefined' && priceIncreased ? (
-            <ArrowUp className="h-4 w-4"  data-testid="arrow-up-icon"/>
+            <ArrowUp className="h-4 w-4" data-testid="arrow-up-icon" />
           ) : (
             <ArrowDown className="h-4 w-4" />
           )}

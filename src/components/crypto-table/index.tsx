@@ -48,7 +48,10 @@ export default function CryptoTable() {
 
       <CardContent>
         {error ? (
-          <div className="text-destructive py-4 text-center" data-testid="crypto-table-error">
+          <div
+            className="text-destructive py-4 text-center"
+            data-testid="crypto-table-error"
+          >
             {error.message}
           </div>
         ) : (
