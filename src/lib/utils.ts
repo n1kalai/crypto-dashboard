@@ -35,13 +35,22 @@ export const formatMarketCap = (marketCap: string) => {
   }
 }
 
-export const formatPercent = (percent: string) => {
-  return Number.parseFloat(percent).toFixed(2) + '%'
-}
-
 export function getTimeFromMilliseconds(ms: number) {
   const date = new Date(ms)
   const hours = date.getHours().toString().padStart(2, '0') // Ensure two-digit format
   const minutes = date.getMinutes().toString().padStart(2, '0')
   return `${hours}:${minutes}`
+}
+
+export const formatPriceForChart = (price: number | string | null): string => {
+  if (price === null) return 'N/A'
+  const numPrice = typeof price === 'string' ? Number.parseFloat(price) : price
+
+  if (numPrice < 1) {
+    return `$${numPrice.toFixed(4)}`
+  } else if (numPrice < 1000) {
+    return `$${numPrice.toFixed(2)}`
+  } else {
+    return `$${numPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+  }
 }

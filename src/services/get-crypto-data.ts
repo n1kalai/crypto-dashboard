@@ -2,7 +2,7 @@ import type { Crypto } from '@/types/crypto-type'
 import { queryOptions } from '@tanstack/react-query'
 import { CRYPTO_DATA } from './query-keys'
 
-const fetchCryptoData = async (): Promise<Record<string, Crypto>> => {
+export const fetchCryptoData = async (): Promise<Record<string, Crypto>> => {
   try {
     const response = await fetch(`https://api.coincap.io/v2/assets?limit=10`)
 
@@ -12,7 +12,7 @@ const fetchCryptoData = async (): Promise<Record<string, Crypto>> => {
 
     const data = await response.json()
 
-    return data.data.reduce((acc: Record<string, Crypto>, crypto: any) => {
+    return data.data.reduce((acc: Record<string, Crypto>, crypto: Crypto) => {
       acc[crypto.id] = {
         id: crypto.id,
         rank: crypto.rank,
@@ -26,6 +26,7 @@ const fetchCryptoData = async (): Promise<Record<string, Crypto>> => {
       return acc
     }, {})
   } catch (err) {
+    console.log('Error', err)
     throw new Error('Failed to fetch cryptocurrency data')
   }
 }
