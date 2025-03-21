@@ -17,12 +17,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Params }) {
   const nav = await fetchCryptoData()
   const { id } = await params
+  const title = nav?.[id]?.name || ''
   return {
-    title: nav[id].name,
-    description: nav[id].name,
+    title,
+    description: title,
     openGraph: {
-      title: nav[id].name,
-      description: nav[id].name,
+      title,
+      description: title,
       images: [
         {
           url: 'https://images.unsplash.com/photo-1631603090989-93f9ef6f9d80?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -37,8 +38,8 @@ export async function generateMetadata({ params }: { params: Params }) {
       ],
     },
     twitter: {
-      title: nav[id].name,
-      description: nav[id].name,
+      title,
+      description: title,
       images: [
         {
           url: 'https://images.unsplash.com/photo-1631603090989-93f9ef6f9d80?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',

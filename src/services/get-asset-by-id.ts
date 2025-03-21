@@ -24,25 +24,25 @@ export const getAssetById = async ({
   start: number
   timeFrame: TimeFrame
 }): Promise<AssetType[]> => {
-  const res = await fetch(
-    `https://api.coincap.io/v2/assets/${id}/history?interval=${interval}&start=${start}&end=${Date.now()}`,
-    { next: { tags: ['asset', id] } },
-  )
+  try {
+    const res = await fetch(
+      `https://api.coincap.io/v2/assets/${id}/history?interval=${interval}&start=${start}&end=${Date.now()}`,
+      { next: { tags: ['asset', id], revalidate: 60 * 60 } },
+    )
 
-  if (!res.ok) {
-    return []
-  }
-
-  const data = await res.json()
-
-  const formattedData = data.data.map((item: AssetType) => {
-    const date = new Date(item.time)
-    return {
-      date: formatDateByTimeFrame(date, timeFrame),
-      price: Number.parseFloat(item.priceUsd),
-      fullDate: date,
+    if (!res.ok) {
+      return [] // Return an empty array if the request fails, and if it is empty we know it has failed
     }
-  })
 
-  return formattedData
+    const data = await res.json()
+
+    return data.data.map((item: AssetType) => ({
+      date: formatDateByTimeFrame(new Date(item.time), timeFrame),
+      price: Number.parseFloat(item.priceUsd),
+      fullDate: new Date(item.time),
+    }))
+  } catch (error) {
+    console.error('Error fetching asset data:', error)
+    return [] // Return an empty array if the request fails, and if it is empty we know it has failed
+  }
 }

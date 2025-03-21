@@ -101,7 +101,7 @@ export default function CurrencyConverter() {
     if (+state.amount < 0) {
       dispatch({
         type: 'SET_ERROR',
-        payload: 'Please provide correct number',
+        payload: 'Please provide positive number',
       })
       return
     }
@@ -120,6 +120,7 @@ export default function CurrencyConverter() {
 
       const fromValueInUsd =
         Number.parseFloat(state.amount) * Number.parseFloat(fromCrypto.priceUsd)
+
       const convertedValue =
         fromValueInUsd / Number.parseFloat(toCrypto.priceUsd)
 

@@ -4,10 +4,12 @@ import { CRYPTO_DATA } from './query-keys'
 
 export const fetchCryptoData = async (): Promise<Record<string, Crypto>> => {
   try {
-    const response = await fetch(`https://api.coincap.io/v2/assets?limit=10`)
+    const response = await fetch(`https://api.coincap.io/v2/assets?limit=10`, {
+      next: { tags: [CRYPTO_DATA] },
+    })
 
     if (!response.ok) {
-      throw new Error('Failed to fetch cryptocurrency data')
+      return {} // Return an empty object if the request fails, and if it is empty we know it has failed
     }
 
     const data = await response.json()
@@ -27,7 +29,7 @@ export const fetchCryptoData = async (): Promise<Record<string, Crypto>> => {
     }, {})
   } catch (err) {
     console.log('Error', err)
-    throw new Error('Failed to fetch cryptocurrency data')
+    return {} //  Return an empty object if the request fails, and if it is empty we know it has failed
   }
 }
 

@@ -9,6 +9,7 @@ import { formatPrice } from '@/lib/utils'
 import { CryptoContainerHeader } from './components/container-header'
 import { CryptoTableHeader } from './components/table-header'
 import { CryptoTableRow } from './components/crypt-table-row'
+import { useMemo } from 'react'
 
 export default function CryptoTable() {
   const {
@@ -19,7 +20,7 @@ export default function CryptoTable() {
     refetchCryptoData,
   } = useCryptoData()
 
-  const cryptoData = Object.values(cryptos)
+  const cryptoData = useMemo(() => Object.values(cryptos) || [], [cryptos])
 
   return (
     <Card>

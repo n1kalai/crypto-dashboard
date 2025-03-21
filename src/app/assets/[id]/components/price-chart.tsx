@@ -73,10 +73,10 @@ export default function PriceChart({
 
   const selectedCrypto = assetId as string
   const cryptoList = Object.values(data || {})
-  const currentPrice = data[selectedCrypto].priceUsd
+  const currentPrice = data?.[selectedCrypto]?.priceUsd ?? 0
 
-  const [timeFrame, setTimeFrame] = useState<TimeFrame>('7d')
-  const [priceData, setPriceData] = useState<AssetType[]>(sevenDayData)
+  const [timeFrame, setTimeFrame] = useState<TimeFrame>('1d')
+  const [priceData, setPriceData] = useState<AssetType[]>(oneDayData)
 
   const oneMonthError = timeFrame === '30d' && oneMonthData.length === 0
   const oneDayError = timeFrame === '1d' && oneDayData.length === 0
@@ -124,6 +124,7 @@ export default function PriceChart({
                 onClick={() => {
                   setTimeFrame('1d')
                   setPriceData(oneDayData)
+                  localStorage.setItem('timeframe', '1d')
                 }}
               >
                 24H
@@ -134,6 +135,7 @@ export default function PriceChart({
                 onClick={() => {
                   setTimeFrame('7d')
                   setPriceData(sevenDayData)
+                  localStorage.setItem('timeframe', '7d')
                 }}
               >
                 7D
@@ -144,6 +146,7 @@ export default function PriceChart({
                 onClick={() => {
                   setTimeFrame('30d')
                   setPriceData(oneMonthData)
+                  localStorage.setItem('timeframe', '30d')
                 }}
               >
                 30D
