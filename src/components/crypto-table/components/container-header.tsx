@@ -14,7 +14,7 @@ type Props = {
   refetchCryptoData: () => void
   isFetching: boolean
   searchString: string
-  onSearchChange: (e: ChangeEvent<HTMLInputElement>) => void
+  onSearchChange: (_e: ChangeEvent<HTMLInputElement>) => void
 }
 
 export const CryptoContainerHeader = ({

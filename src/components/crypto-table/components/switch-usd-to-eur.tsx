@@ -15,7 +15,7 @@ export const SwitchUSDToEUR = () => {
       <Switch
         id="currency-toggle"
         checked={showEUR}
-        onCheckedChange={(e) => {
+        onCheckedChange={() => {
           if (showEUR) {
             push('/?ex=usd')
           } else {

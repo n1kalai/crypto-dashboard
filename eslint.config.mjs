@@ -20,6 +20,7 @@ const eslintConfig = [
       'eslint-config-prettier',
     ],
     rules: {
+      "react/no-unescaped-entities": "off",
       'no-unused-vars': [
         'error',
         {
