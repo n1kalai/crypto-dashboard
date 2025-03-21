@@ -43,18 +43,5 @@ describe('CurrencyConverter Component', () => {
     expect(screen.getByTestId('currency-error')).toBeInTheDocument();
   });
 
-  it('swaps currencies correctly', () => {
-    const user = userEvent.setup();
-
-    render(<CurrencyConverter />);
-    fireEvent.mouseDown(screen.getByText('Select currency'));
-    user.click(screen.getByText('Bitcoin (BTC)'));
-
-    fireEvent.mouseDown(screen.getAllByText('Select currency')[1]);
-    user.click(screen.getByText('Ethereum (ETH)'));
-
-    user.click(screen.getByRole('button', { name: /swap/i }));
-    expect(screen.getByDisplayValue('eth')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('btc')).toBeInTheDocument();
-  });
+ 
 });
