@@ -42,6 +42,8 @@ export const metadata = {
   },
 }
 
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   const queryClient = getQueryClient()
   void queryClient.prefetchQuery(cryptoDataOptions)

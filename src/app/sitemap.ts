@@ -1,7 +1,7 @@
-import { fetchCryptoData } from '@/services/get-crypto-data'
+import { getSitemapData } from '@/services/get-sitemap-data'
 
 export default async function sitemap() {
-  const data = await fetchCryptoData()
+  const data = await getSitemapData()
   const frontEndurl = 'https://example.com'
 
   const arrToReturn = [
