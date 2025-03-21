@@ -25,8 +25,11 @@ export default function CryptoTable() {
     const data = Object.values(cryptos)
 
     if (searchString) {
-      return data.filter((crypto) =>
-        crypto.name.toLowerCase().includes(searchString.toLowerCase()),
+      return data.filter(
+        (crypto) =>
+          crypto.name.toLowerCase().includes(searchString) ||
+          crypto.symbol.toLowerCase().includes(searchString) ||
+          crypto.rank.includes(searchString),
       )
     } else {
       return data
