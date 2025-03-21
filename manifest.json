@@ -1,0 +1,16 @@
+{
+  "name": "Crypto Dashboard",
+  "short_name": "CD",
+  "description": "Real-time cryptocurrency market cap rankings, trading charts, and more.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#a1a1a1",
+  "icons": [
+    {
+      "src": "./src/app/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

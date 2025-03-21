@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: fronted-url.com
+
+# Sitemaps
+Sitemap: fronted-url.com/sitemap.xml
