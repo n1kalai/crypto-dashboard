@@ -5,13 +5,13 @@ import { RefreshCw } from 'lucide-react'
 type Props = {
   dataUpdatedAt: number
   refetchCryptoData: () => void
-  isLoading: boolean
+  isFetching: boolean
 }
 
 export const CryptoContainerHeader = ({
   dataUpdatedAt,
   refetchCryptoData,
-  isLoading,
+  isFetching,
 }: Props) => (
   <CardHeader>
     <div className="flex items-center justify-between">
@@ -28,9 +28,9 @@ export const CryptoContainerHeader = ({
       <button
         onClick={() => refetchCryptoData()}
         className="text-muted-foreground hover:text-primary flex items-center gap-1 text-sm"
-        disabled={isLoading}
+        disabled={isFetching}
       >
-        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+        <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
         Refresh
       </button>
     </div>

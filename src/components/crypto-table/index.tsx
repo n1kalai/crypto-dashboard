@@ -13,7 +13,7 @@ import { CryptoTableRow } from './components/crypt-table-row'
 export default function CryptoTable() {
   const {
     data: cryptos,
-    isLoading,
+    isFetching,
     error,
     dataUpdatedAt,
     refetchCryptoData,
@@ -26,7 +26,7 @@ export default function CryptoTable() {
       <CryptoContainerHeader
         dataUpdatedAt={dataUpdatedAt}
         refetchCryptoData={refetchCryptoData}
-        isLoading={isLoading}
+        isFetching={isFetching}
       />
 
       <CardContent>
