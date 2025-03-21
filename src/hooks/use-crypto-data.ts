@@ -8,7 +8,7 @@ import { CRYPTO_DATA } from '@/services/query-keys'
 cryptoDataOptions.enabled = false // not to fetch data more than 1, we shall update using socket
 
 export const useCryptoData = () => {
-  const { data, isLoading, error, dataUpdatedAt, refetch } =
+  const { data, isFetching, error, dataUpdatedAt, refetch } =
     useSuspenseQuery(cryptoDataOptions)
 
   const queryClient = useQueryClient()
@@ -60,7 +60,7 @@ export const useCryptoData = () => {
       }
     }
 
-    pricesWs.onerror = (err) => console.error('WebSocket error:', err)
+    pricesWs.onerror = (err) => console.log('WebSocket error:', err)
 
     return () => {
       if (interval) {
@@ -73,5 +73,5 @@ export const useCryptoData = () => {
     }
   }, [])
 
-  return { data, isLoading, error, dataUpdatedAt, refetchCryptoData: refetch }
+  return { data, isFetching, error, dataUpdatedAt, refetchCryptoData: refetch }
 }
