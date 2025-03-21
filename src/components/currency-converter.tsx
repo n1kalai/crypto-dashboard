@@ -160,7 +160,7 @@ export default function CurrencyConverter() {
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select currency" />
+              <SelectValue placeholder="Select currency"   data-testid="from-currency"  />
             </SelectTrigger>
             <SelectContent>
               {cryptos.map((crypto) => (
@@ -184,9 +184,10 @@ export default function CurrencyConverter() {
             onValueChange={(value) =>
               dispatch({ type: 'SET_TO_CURRENCY', payload: value })
             }
+            data-testid="to-currency"
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Select currency" />
+            <SelectTrigger >
+              <SelectValue placeholder="Select currency"  />
             </SelectTrigger>
             <SelectContent>
               {cryptos.map((crypto) => (
@@ -200,7 +201,7 @@ export default function CurrencyConverter() {
           <Button onClick={handleConvert}>Convert</Button>
 
           {state.error && (
-            <div className="text-destructive mt-2 text-sm">{state.error}</div>
+            <div className="text-destructive mt-2 text-sm" data-testid="currency-error">{state.error}</div>
           )}
           {state.convertedAmount && (
             <div className="bg-muted mt-4 rounded-md p-4">

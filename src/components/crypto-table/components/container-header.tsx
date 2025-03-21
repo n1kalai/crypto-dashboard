@@ -46,6 +46,7 @@ export const CryptoContainerHeader = ({
         >
           <RefreshCw
             className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`}
+            data-testid="refresh-icon"
           />
           Refresh
         </button>
@@ -59,6 +60,7 @@ export const CryptoContainerHeader = ({
         value={searchString}
         onChange={onSearchChange}
         className="pl-8"
+        data-testid="search"
       />
     </div>
   </CardHeader>
