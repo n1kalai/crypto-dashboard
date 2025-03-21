@@ -1,8 +1,12 @@
+"use client"
+
 import { TableCell, TableRow } from '@/components/ui/table'
-import { formatMarketCap } from '@/lib/utils'
+import { formatMarketCap, formatTablePrice } from '@/lib/utils'
 import { Crypto } from '@/types/crypto-type'
 import { ArrowDown, ArrowUp } from 'lucide-react'
 import cs from 'classnames'
+import { useSearchParams } from 'next/navigation'
+import { EUR_PRICE } from '@/lib/constants'
 
 type Props = {
   crypto: Crypto
@@ -11,12 +15,20 @@ type Props = {
   isnotDefined?: boolean
 }
 
+
 export const CryptoTableRow = ({
   crypto,
   price,
   isPositive,
   isnotDefined,
-}: Props) => (
+}: Props) => {
+  const urlParams = useSearchParams()
+
+  const exchange = urlParams.get('ex')
+  const showEUR = typeof exchange === 'string' && exchange === 'eur'
+
+  
+  return (
   <TableRow key={crypto.id + '-' + price} className={crypto.className || ''}>
     <TableCell className="font-medium">{crypto.rank}</TableCell>
     <TableCell>
@@ -33,7 +45,7 @@ export const CryptoTableRow = ({
           'text-black': isnotDefined,
         })}
       >
-        {price}
+        {formatTablePrice(price, showEUR, EUR_PRICE)}
 
         {typeof isPositive !== 'undefined' && isPositive ? (
           <ArrowUp className="h-4 w-4" />
@@ -42,8 +54,8 @@ export const CryptoTableRow = ({
         )}
       </div>
     </TableCell>
-    <TableCell className="text-right">
-      {formatMarketCap(crypto.marketCapUsd)}
+    <TableCell className="hidden text-right md:table-cell">
+      {formatMarketCap(crypto.marketCapUsd, showEUR, EUR_PRICE)}
     </TableCell>
   </TableRow>
-)
+)}

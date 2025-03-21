@@ -5,7 +5,7 @@ import { CRYPTO_DATA } from './query-keys'
 export const fetchCryptoData = async (): Promise<Record<string, Crypto>> => {
   try {
     const response = await fetch(`https://api.coincap.io/v2/assets?limit=10`, {
-      next: { tags: [CRYPTO_DATA] },
+      next: { tags: [CRYPTO_DATA], revalidate: 0 },
     })
 
     if (!response.ok) {

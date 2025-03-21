@@ -5,33 +5,45 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const formatPrice = (price: string) => {
+export const formatTablePrice = (
+  price: string,
+  showEUR: boolean,
+  EUR_USD_RATE: number,
+) => {
   const numPrice = Number.parseFloat(price)
-  if (numPrice > 1000) {
+
+  const convertedPrice = showEUR ? numPrice * EUR_USD_RATE : numPrice
+  const currencySymbol = showEUR ? '€' : '$'
+
+  if (convertedPrice > 1) {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    }).format(numPrice)
+      currency: showEUR ? 'EUR' : 'USD',
+      currencyDisplay: 'symbol',
+    }).format(convertedPrice)
   } else {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 6,
-    }).format(numPrice)
+    return currencySymbol + convertedPrice.toFixed(6)
   }
 }
 
-export const formatMarketCap = (marketCap: string) => {
+export const formatMarketCap = (
+  marketCap: string,
+  showEUR: boolean,
+  EUR_USD_RATE: number,
+) => {
   const cap = Number.parseFloat(marketCap)
-  if (cap >= 1e12) {
-    return `$${(cap / 1e12).toFixed(2)}T`
-  } else if (cap >= 1e9) {
-    return `$${(cap / 1e9).toFixed(2)}B`
-  } else if (cap >= 1e6) {
-    return `$${(cap / 1e6).toFixed(2)}M`
+  // Convert to EUR if the toggle is on
+  const convertedCap = showEUR ? cap * EUR_USD_RATE : cap
+  const currencySymbol = showEUR ? '€' : '$'
+
+  if (convertedCap >= 1e12) {
+    return `${currencySymbol}${(convertedCap / 1e12).toFixed(2)}T`
+  } else if (convertedCap >= 1e9) {
+    return `${currencySymbol}${(convertedCap / 1e9).toFixed(2)}B`
+  } else if (convertedCap >= 1e6) {
+    return `${currencySymbol}${(convertedCap / 1e6).toFixed(2)}M`
   } else {
-    return `$${cap.toFixed(2)}`
+    return `${currencySymbol}${convertedCap.toFixed(2)}`
   }
 }
 

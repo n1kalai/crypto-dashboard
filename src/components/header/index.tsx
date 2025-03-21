@@ -22,7 +22,7 @@ export default function ResponsiveHeader({ nav }: { nav: Crypto[] }) {
 
   return (
     <header className="bg-background sticky top-0 z-50 w-full border-b">
-      <div className="container mx-auto flex h-16 items-center justify-between">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <Link href="/" className="text-xl font-bold">
             <HomeIcon />
@@ -53,8 +53,13 @@ export default function ResponsiveHeader({ nav }: { nav: Crypto[] }) {
           <SheetDescription className="hidden">Menu</SheetDescription>
 
           <SheetTrigger asChild className="lg:hidden">
-            <Button variant="ghost" size="icon" aria-label="Menu">
-              <Menu className="h-5 w-5" />
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Menu"
+              className="w-3"
+            >
+              <Menu className="h-5 w-3" />
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[240px] sm:w-[300px]">

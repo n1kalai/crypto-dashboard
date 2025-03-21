@@ -4,8 +4,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableBody } from '@/components/ui/table'
 import { useCryptoData } from '@/hooks/use-crypto-data'
 
-import { formatPrice } from '@/lib/utils'
-
 import { CryptoContainerHeader } from './components/container-header'
 import { CryptoTableHeader } from './components/table-header'
 import { CryptoTableRow } from './components/crypt-table-row'
@@ -45,13 +43,11 @@ export default function CryptoTable() {
                   const isPositive = crypto.className === 'highlight-green'
                   const isnotDefined = typeof crypto.className === 'undefined'
 
-                  const price = formatPrice(crypto.priceUsd)
-
                   return (
                     <CryptoTableRow
                       key={crypto.id}
                       crypto={crypto}
-                      price={price}
+                      price={crypto.priceUsd}
                       isPositive={isPositive}
                       isnotDefined={isnotDefined}
                     />

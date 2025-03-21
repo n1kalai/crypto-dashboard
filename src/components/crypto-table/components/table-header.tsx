@@ -6,7 +6,9 @@ export const CryptoTableHeader = () => (
       <TableHead className="w-[80px]">Rank</TableHead>
       <TableHead>Name</TableHead>
       <TableHead className="text-right">Price</TableHead>
-      <TableHead className="text-right">Market Cap</TableHead>
+      <TableHead className="hidden text-right md:table-cell">
+        Market Cap
+      </TableHead>
     </TableRow>
   </TableHeader>
 )
