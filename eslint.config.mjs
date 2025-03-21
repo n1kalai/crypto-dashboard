@@ -19,6 +19,17 @@ const eslintConfig = [
       'prettier',
       'eslint-config-prettier',
     ],
+    rules: {
+      'no-unused-vars': [
+        'error',
+        {
+          vars: 'all',
+          args: 'after-used',
+          ignoreRestSiblings: true,
+          argsIgnorePattern: '^_',
+        },
+      ],
+    },
   }),
 ]
 
