@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+(for english, scroll down)
 
-## Getting Started
+პროექტში გამოყენებულია: 
+- Next.js 15.2.3 
+- CoinCap API 
+- Node.js v20.10.0 
+- npm v10.2.3.
 
-First, run the development server:
+დაკლონვის შემდეგ გაუშვით:
+1.  `npm install`
+2.  `npm run dev`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### არქიტექტურული გადაწყვეტილები:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- პროექტში გამოყენებულია სოკეტები ინფორმაციის ლაივ რეჟიმში განსაახლებლად, თუ სოკეტი გაფეილდა ყოველ ერთ წუთში ავტომატურად მოხდება დატას წამოღება. 
+- ქეშირებისთვის, ერთი და იგივე დატას სწრაფი მიღებისთვის და უკვე დაფეტჩილი დატის სხვადასხვა ადგილებში გამოყენების და განახლების მიზნით ვიყენებ react-query-ს 
+- თითოეული ასეტის ფეიჯი სტატიკურია და ბილდის დროს გენერირდება HTML ფაილად, უკეთესი პერფორმანსისთვის (ნახლდება ინფორმაცია ყოველ 1 საათში, ვიცი რომ არასწორია სავაჭრო ჩარტისთვის თუმცა სატესტო რადგანაა…) 
+- მთავარ გვერდზე, დატა იფეტჩება მხოლოდ ერთხელ და შემდეგ ნახლდება სოკეტების დახმარებით, რათა მომხმარებელს ყოველთვის ახალი ინფორმაცია ქონდეს 
+- ასეტების დატა არის ერეის ფორმატის, რისი შეცვლაც სოკეტიდან მოსული აფდეითისთვის არის არაპერფორმანსიული (მოდის ობიექტი), ამიტომ მიღებული ერეის მხოლოდ ერთხელ ხდება ობიექტად გარდაქმნა (თავიდანვე), რაც პერფორმანსს ბევრად აჩქარებს ყოველ ჯერზე ერეის ელემენტში ძებნასთან შედარებით.  
+- პროექტი იყენებს tailwind და shadcn/ui კომპონენტებს
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### ტესტების გაშვება:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+	 npm run test
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+<hr>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The project uses:
+- Next.js 15.2.3 
+- CoinCap API 
+- Node.js v20.10.0 
+- npm v10.2.3.
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+After cloning the repository, run:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  `npm install`
+2.  `npm run dev`
+
+
+### Architectural Decisions:
+-   The project uses WebSockets to update information in real-time. If the socket fails, data will be automatically fetched every minute.
+-   I use React Query for caching, enabling fast retrieval of the same data, reusing previously fetched data in different parts of the app, and keeping it updated.
+-   Each asset page is static, generated as an HTML file at build time for better performance. The data updates every hour—I know this isn’t ideal for a trading chart, but since this is for testing...
+-   On the homepage, data is fetched only once and then updated via WebSockets to ensure users always have the latest information.
+-   Asset data is initially received as an array, but since updating an array for WebSocket updates is inefficient (as data comes in object format), the array is converted into an object only once. This significantly improves performance compared to searching through an array every time.
+-   The project uses Tailwind CSS and ShadCN/UI components.
+
+### run tests:
+
+	 `npm run test`
