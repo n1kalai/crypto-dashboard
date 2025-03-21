@@ -7,7 +7,8 @@ import { useCryptoData } from '@/hooks/use-crypto-data'
 import { CryptoContainerHeader } from './components/container-header'
 import { CryptoTableHeader } from './components/table-header'
 import { CryptoTableRow } from './components/crypt-table-row'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { NotFoundCell } from './components/not-found-cell'
 
 export default function CryptoTable() {
   const {
@@ -18,7 +19,19 @@ export default function CryptoTable() {
     refetchCryptoData,
   } = useCryptoData()
 
-  const cryptoData = useMemo(() => Object.values(cryptos) || [], [cryptos])
+  const [searchString, setSearchString] = useState('')
+
+  const cryptoData = useMemo(() => {
+    const data = Object.values(cryptos)
+
+    if (searchString) {
+      return data.filter((crypto) =>
+        crypto.name.toLowerCase().includes(searchString.toLowerCase()),
+      )
+    } else {
+      return data
+    }
+  }, [searchString])
 
   return (
     <Card>
@@ -26,6 +39,8 @@ export default function CryptoTable() {
         dataUpdatedAt={dataUpdatedAt}
         refetchCryptoData={refetchCryptoData}
         isFetching={isFetching}
+        searchString={searchString}
+        onSearchChange={(e) => setSearchString(e.target.value)}
       />
 
       <CardContent>
@@ -39,20 +54,26 @@ export default function CryptoTable() {
               <CryptoTableHeader />
 
               <TableBody>
-                {cryptoData.map((crypto) => {
-                  const isPositive = crypto.className === 'highlight-green'
-                  const isnotDefined = typeof crypto.className === 'undefined'
+                {searchString && cryptoData.length === 0 ? (
+                  <NotFoundCell searchString={searchString} />
+                ) : (
+                  cryptoData.map((crypto) => {
+                    const priceIncreased =
+                      crypto.className === 'highlight-green'
+                    const priceNotUpdated =
+                      typeof crypto.className === 'undefined'
 
-                  return (
-                    <CryptoTableRow
-                      key={crypto.id}
-                      crypto={crypto}
-                      price={crypto.priceUsd}
-                      isPositive={isPositive}
-                      isnotDefined={isnotDefined}
-                    />
-                  )
-                })}
+                    return (
+                      <CryptoTableRow
+                        key={crypto.id}
+                        crypto={crypto}
+                        price={crypto.priceUsd}
+                        priceIncreased={priceIncreased}
+                        priceNotUpdated={priceNotUpdated}
+                      />
+                    )
+                  })
+                )}
               </TableBody>
             </Table>
           </div>
