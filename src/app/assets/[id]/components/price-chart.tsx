@@ -164,11 +164,11 @@ export default function PriceChart({
       </CardHeader>
       <CardContent>
         {error ? (
-          <div className="text-destructive flex h-[400px] items-center justify-center">
+          <div className="text-destructive flex h-[200px] md:h-[400px] items-center justify-center">
             <p>{error}</p>
           </div>
         ) : (
-          <div className="h-[400px] w-full">
+          <div className="h-[200px] md:h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={priceData}
