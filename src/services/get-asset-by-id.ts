@@ -23,6 +23,8 @@ export const getAssetById = async ({
   start: number
   timeFrame: TimeFrame
 }): Promise<AssetType[]> => {
+  console.log('interval', interval)
+  console.log('timeFrame', timeFrame)
   try {
     const res = await fetch(
       `https://api.coincap.io/v2/assets/${id}/history?interval=${interval}&start=${start}&end=${Date.now()}`,

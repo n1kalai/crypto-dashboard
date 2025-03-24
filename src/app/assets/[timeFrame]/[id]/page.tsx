@@ -78,8 +78,7 @@ export default async function Page(props: { params: Params }) {
   void queryClient.prefetchQuery(cryptoDataOptions)
 
   const data = await getAssetById({
-    id: id,
-    start: Date.now() - 24 * 60 * 60 * 1000,
+    id,
     ...timeFrames[timeFrame as keyof typeof timeFrames],
   })
 
