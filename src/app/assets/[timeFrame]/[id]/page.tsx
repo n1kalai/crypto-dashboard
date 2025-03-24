@@ -3,15 +3,25 @@ import { getAssetById } from '@/services/get-asset-by-id'
 import { cryptoDataOptions, fetchCryptoData } from '@/services/get-crypto-data'
 import PriceChart from './components/price-chart'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { timeFrames } from '@/lib/constants'
 
 export const dynamic = 'force-static'
+const timeFrameValues = Object.keys(timeFrames)
 
-type Params = Promise<{ id: string }>
+type Params = Promise<{ id: string; timeFrame: string }>
 
 export async function generateStaticParams() {
   const nav = await fetchCryptoData()
 
-  return Object.keys(nav).map((id) => ({ id }))
+  const arrToReturn: Array<{ id: string; timeFrame: string }> = []
+
+  Object.keys(nav).forEach((id) =>
+    timeFrameValues.forEach((timeFrame) => {
+      arrToReturn.push({ id, timeFrame })
+    }),
+  )
+
+  return arrToReturn
 }
 
 export async function generateMetadata({ params }: { params: Params }) {
@@ -62,40 +72,21 @@ export async function generateMetadata({ params }: { params: Params }) {
 
 export default async function Page(props: { params: Params }) {
   const params = await props.params
-  const { id } = params
+  const { id, timeFrame } = params
 
   const queryClient = getQueryClient()
   void queryClient.prefetchQuery(cryptoDataOptions)
 
-  const [oneDayData, sevenDayData, oneMonthData] = await Promise.all([
-    getAssetById({
-      id: id,
-      interval: 'm5',
-      start: Date.now() - 24 * 60 * 60 * 1000,
-      timeFrame: '1d',
-    }),
-    getAssetById({
-      id: id,
-      interval: 'h2',
-      start: Date.now() - 7 * 24 * 60 * 60 * 1000,
-      timeFrame: '7d',
-    }),
-    getAssetById({
-      id: id,
-      interval: 'h12',
-      start: Date.now() - 30 * 24 * 60 * 60 * 1000,
-      timeFrame: '30d',
-    }),
-  ])
+  const data = await getAssetById({
+    id: id,
+    start: Date.now() - 24 * 60 * 60 * 1000,
+    ...timeFrames[timeFrame as keyof typeof timeFrames],
+  })
 
   return (
     <main className="container mx-auto px-4 py-8">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <PriceChart
-          oneDayData={oneDayData}
-          sevenDayData={sevenDayData}
-          oneMonthData={oneMonthData}
-        />
+        <PriceChart chartData={data} />
       </HydrationBoundary>
     </main>
   )

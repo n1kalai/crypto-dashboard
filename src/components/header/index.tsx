@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { HomeIcon, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -18,7 +18,16 @@ import { useParams } from 'next/navigation'
 
 export default function ResponsiveHeader({ nav }: { nav: Crypto[] }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [timeFrame, setTimeFrame] = useState<string>('1d')
   const params = useParams()
+
+  useEffect(() => {
+    const timeF = localStorage.getItem('timeFrame')
+
+    if (timeF) {
+      setTimeFrame(timeF)
+    }
+  }, [params.timeFrame])
 
   return (
     <header className="bg-background sticky top-0 z-50 w-full border-b">
@@ -34,7 +43,7 @@ export default function ResponsiveHeader({ nav }: { nav: Crypto[] }) {
           {nav.map((item) => (
             <Link
               key={item.id}
-              href={`/assets/${item.id}`}
+              href={`/assets/${timeFrame}/${item.id}`}
               className={cs(
                 'hover:bg-accent hover:text-accent-foreground block rounded-md px-4 py-2 text-sm font-medium transition-colors',
                 {

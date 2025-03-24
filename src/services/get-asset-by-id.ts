@@ -1,7 +1,6 @@
 import { AssetType } from '@/types/asset-type'
+import { TimeFrame } from '@/types/time-frame'
 import { format } from 'date-fns'
-
-type TimeFrame = '1d' | '7d' | '30d'
 
 const formatDateByTimeFrame = (date: Date, timeFrame: TimeFrame): string => {
   if (timeFrame === '1d') {

@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import {
   Area,
   AreaChart,
@@ -34,8 +33,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { useParams, useRouter } from 'next/navigation'
 import { formatPriceForChart } from '@/lib/utils'
 import Script from 'next/script'
-
-type TimeFrame = '1d' | '7d' | '30d'
+import { timeFrames } from '@/lib/constants'
 
 type TooltipProps = {
   active?: boolean
@@ -58,38 +56,30 @@ const CustomTooltip = ({ active, payload }: TooltipProps) => {
 }
 
 type Props = {
-  oneDayData: AssetType[]
-  sevenDayData: AssetType[]
-  oneMonthData: AssetType[]
+  chartData: AssetType[]
 }
 
-export default function PriceChart({
-  oneDayData,
-  sevenDayData,
-  oneMonthData,
-}: Props) {
+export default function PriceChart({ chartData }: Props) {
   const { data } = useSuspenseQuery(cryptoDataOptions)
   const { push } = useRouter()
-  const { id: assetId } = useParams()
+  const { id: assetId, timeFrame } = useParams<{
+    id: string
+    timeFrame: keyof typeof timeFrames
+  }>()
 
-  const selectedCrypto = assetId as string
   const cryptoList = Object.values(data || {})
-  const crypto = data[selectedCrypto]
+  const crypto = data[assetId]
   const currentPrice = crypto?.priceUsd ?? 0
 
-  const [timeFrame, setTimeFrame] = useState<TimeFrame>('1d')
-  const [priceData, setPriceData] = useState<AssetType[]>(oneDayData)
+  if (!timeFrames[timeFrame] || !crypto) {
+    return null
+  }
 
-  const oneMonthError = timeFrame === '30d' && oneMonthData.length === 0
-  const oneDayError = timeFrame === '1d' && oneDayData.length === 0
-  const sevenDayError = timeFrame === '7d' && sevenDayData.length === 0
-
-  const error =
-    oneMonthError || oneDayError || sevenDayError ? 'No data available' : null
+  const error = chartData.length === 0 ? 'No data available' : null
 
   // Get current crypto name and symbol
   const getCurrentCryptoInfo = () => {
-    return crypto ? `${crypto.name} (${crypto.symbol})` : selectedCrypto
+    return crypto ? `${crypto.name} (${crypto.symbol})` : assetId
   }
 
   const schema = {
@@ -99,7 +89,7 @@ export default function PriceChart({
     identifier: crypto.symbol,
     offers: {
       '@type': 'Offer',
-      price: crypto.priceUsd,
+      price: currentPrice,
       priceCurrency: 'USD',
     },
   }
@@ -117,8 +107,8 @@ export default function PriceChart({
             </div>
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
               <Select
-                value={selectedCrypto}
-                onValueChange={(v) => push('/assets/' + v)}
+                value={assetId}
+                onValueChange={(v) => push(`/assets/${timeFrame}/${v}`)}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select cryptocurrency" />
@@ -136,9 +126,8 @@ export default function PriceChart({
                   variant={timeFrame === '1d' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => {
-                    setTimeFrame('1d')
-                    setPriceData(oneDayData)
-                    localStorage.setItem('timeframe', '1d')
+                    localStorage.setItem('timeFrame', '1d')
+                    push(`/assets/1d/${assetId}`)
                   }}
                 >
                   24H
@@ -147,9 +136,8 @@ export default function PriceChart({
                   variant={timeFrame === '7d' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => {
-                    setTimeFrame('7d')
-                    setPriceData(sevenDayData)
-                    localStorage.setItem('timeframe', '7d')
+                    localStorage.setItem('timeFrame', '7d')
+                    push(`/assets/7d/${assetId}`)
                   }}
                 >
                   7D
@@ -158,9 +146,8 @@ export default function PriceChart({
                   variant={timeFrame === '30d' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => {
-                    setTimeFrame('30d')
-                    setPriceData(oneMonthData)
-                    localStorage.setItem('timeframe', '30d')
+                    localStorage.setItem('timeFrame', '30d')
+                    push(`/assets/30d/${assetId}`)
                   }}
                 >
                   30D
@@ -185,7 +172,7 @@ export default function PriceChart({
             <div className="h-[200px] w-full md:h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
-                  data={priceData}
+                  data={chartData}
                   margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                 >
                   <defs>
